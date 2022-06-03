@@ -22,7 +22,7 @@ stopBtn.addEventListener('click', e => {
 });
 
 // ==========Styles button==========
-
+document.body.style.transition = 'all 2s ease-in-out';
 startBtn.style.display = 'block';
 stopBtn.style.display = 'block';
 startBtn.style.margin = '0 auto';
