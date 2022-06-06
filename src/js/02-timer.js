@@ -1,6 +1,7 @@
 // Описан в документации
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
+import Notiflix from 'notiflix';
 
 // Получаем элементы, содержащие компоненты даты
 const refs = {
@@ -11,42 +12,12 @@ const refs = {
   minutes: document.querySelector('[data-minutes]'),
   seconds: document.querySelector('[data-seconds]'),
 };
-
-refs.btn.addEventListener('click', () => {
-  // Получаем значение из инпута
-  const inputValue = refs.input.value;
-  // Проверяем на пустоту
-  if (inputValue === '') {
-    return;
-  }
-  // Проверяем на корректность даты
-  const isValidDate = flatpickr.parseDate(inputValue, 'd.m.Y H:i:s').isValid;
-  if (!isValidDate) {
-    return;
-  }
-  // Получаем дату из инпута
-  const inputDate = flatpickr.parseDate(inputValue, 'd.m.Y H:i:s');
-  // Получаем текущую дату
-  const currentDate = new Date();
-  // Получаем количество миллисекунд между датами
-  const diff = inputDate - currentDate;
-  // Получаем количество дней между датами
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  // Получаем количество часов между датами
-  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  // Получаем количество минут между датами
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  // Получаем количество секунд между датами
-  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-  // Выводим количество дней в инпуте
-  refs.days.textContent = days;
-  // Выводим количество часов в инпуте
-  refs.hours.textContent = hours;
-  // Выводим количество минут в инпуте
-  refs.minutes.textContent = minutes;
-  // Выводим количество секунд в инпуте
-  refs.seconds.textContent = seconds;
-});
+refs.btn.disabled = true;
+// Выделяем переменные для времени выбранной даты
+const currentTime = Date.now();
+let timeDifference = null;
+let endOfTime = null;
+let intervalId = null;
 
 const options = {
   enableTime: true,
@@ -54,8 +25,63 @@ const options = {
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-    console.log(selectedDates[0]);
+    selectedDate(selectedDates[0]);
   },
 };
 
-flatpickr(selektor, options);
+flatpickr(refs.input, options);
+
+const selectedDate = selectTime => {
+  if (!refs.btn.disabled) {
+    return;
+  } else {
+    endOfTime = selectTime.getTime();
+    timeDifference = endOfTime - currentTime;
+    if (timeDifference <= 0) {
+      Notiflix.Notify.failure('Пожалуйста выберите дату из будущего');
+      return;
+    } else {
+      refs.btn.disabled = false;
+      return endOfTime;
+    }
+  }
+};
+
+refs.btn.addEventListener('click', () => {
+  intervalId = setInterval(() => {
+    const timeStart = Date.now();
+    timeDifference = endOfTime - timeStart;
+    const time = convertMs(timeDifference);
+
+    refs.days.textContent = time.days;
+    refs.hours.textContent = time.hours;
+    refs.minutes.textContent = time.minutes;
+    refs.seconds.textContent = time.seconds;
+  }, 1000);
+  Notiflix.Notify.success('Таймер запущен');
+});
+
+function convertMs(ms) {
+  // Number of milliseconds per unit of time
+  const second = 1000;
+  const minute = second * 60;
+  const hour = minute * 60;
+  const day = hour * 24;
+
+  // Remaining days
+  const days = addLeadingZero(Math.floor(ms / day));
+  // Remaining hours
+  const hours = addLeadingZero(Math.floor((ms % day) / hour));
+  // Remaining minutes
+  const minutes = addLeadingZero(Math.floor(((ms % day) % hour) / minute));
+  // Remaining seconds
+  const seconds = addLeadingZero(
+    Math.floor((((ms % day) % hour) % minute) / second)
+  );
+
+  return { days, hours, minutes, seconds };
+}
+
+function addLeadingZero(value) {
+  return String(value).padStart(2, '0');
+}
