@@ -1,11 +1,12 @@
 .timer {
   display: flex;
-  /* flex-direction: column; */
   justify-content: center;
   align-items: center;
-  border: 5px solid rgb(111, 100, 211);
+  border: 3px solid rgb(10, 1, 112);
+  border-radius: 4px;
   background-color: rgb(233, 118, 127);
   margin-top: 40px;
+  max-width: 600px;
 }
 
 .field {
@@ -20,20 +21,18 @@
 .value {
   font-size: 52px;
   font-weight: 400;
+  font-family: 'Abril Fatface', cursive;
 }
 
 .delimiter {
+  font-size: 34px;
+  font-weight: 600;
+  color: rgb(102, 102, 102);
   position: relative;
-  top: -12px;
-  font-size: 60px;
-  font-weight: 400;
+  top: -11px;
 }
 
 .label {
   font-size: 16px;
   font-weight: 800;
-}
-
-.hidden {
-  opacity: 0.2;
 }

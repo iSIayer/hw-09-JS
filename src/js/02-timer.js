@@ -6,6 +6,7 @@ import Notiflix from 'notiflix';
 // Получаем элементы, содержащие компоненты даты
 const refs = {
   input: document.querySelector('#datetime-picker'),
+  resetBtn: document.querySelector('[data-reset]'),
   btn: document.querySelector('[data-start]'),
   days: document.querySelector('[data-days]'),
   hours: document.querySelector('[data-hours]'),
@@ -59,6 +60,16 @@ refs.btn.addEventListener('click', () => {
     refs.seconds.textContent = time.seconds;
   }, 1000);
   Notiflix.Notify.success('Таймер запущен');
+});
+
+refs.resetBtn.addEventListener('click', () => {
+  clearInterval(intervalId);
+  refs.btn.disabled = true;
+  refs.days.textContent = '00';
+  refs.hours.textContent = '00';
+  refs.minutes.textContent = '00';
+  refs.seconds.textContent = '00';
+  Notiflix.Notify.success('Таймер остановлен');
 });
 
 function convertMs(ms) {
